@@ -10,18 +10,18 @@ use App\Http\Requests;
 class StudentController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the student.
      *
      * @return \Illuminate\Http\Response
      */
     public function index()
     {
-        $students = Student::all();
-        return StudentResource::collection($students);
+        $students = Student::paginate(15);
+        return (StudentResource::collection($students))->response()->setStatusCode(206);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Show the form for creating a new student.
      *
      * @return \Illuminate\Http\Response
      */
@@ -31,7 +31,7 @@ class StudentController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created student in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
@@ -40,11 +40,11 @@ class StudentController extends Controller
     {
         $student = Student::create($request->all());
 
-        return response()->json($student, 201);
+        return (new StudentResource($student))->response()->setStatusCode(201);
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified student.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
@@ -52,11 +52,14 @@ class StudentController extends Controller
     public function show($id)
     {
         $student = Student::findOrFail($id);
-        return new StudentResource($student);
+        if($student){
+            return (new StudentResource($student))->response()->setStatusCode(200);
+        }
+        return (StudentResource::collection(Student::all()))->response()->setStatusCode(404);
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Show the form for editing the specified student.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
@@ -67,7 +70,7 @@ class StudentController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified student in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
@@ -78,12 +81,12 @@ class StudentController extends Controller
         $student = Student::findOrFail($id);
         $student->update($request->all());
 
-        return response()->json($student, 200);
+        return (new StudentResource($student))->response()->setStatusCode(202);
 
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified student from storage.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
@@ -94,9 +97,9 @@ class StudentController extends Controller
         $students = Student::all();
 
         if($student->delete()){
-            return response()->json($students, 200);
-        } else{
-            return response()->json($student, 400);
+            return (StudentResource::collection($students))->response()->setStatusCode(200);
         }
+        return (new StudentResource($student))->response()->setStatusCode(404);
+        
     }
 }

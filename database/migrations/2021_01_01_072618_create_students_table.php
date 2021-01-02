@@ -18,8 +18,8 @@ class CreateStudentsTable extends Migration
             $table->string('first_name');
             $table->string('middle_name')->nullable();
             $table->string('last_name');
-            $table->string('email');
-            $table->string('contact_no');
+            $table->string('email')->unique();
+            $table->string('contact_no')->unique();
             $table->string('birthdate');
             $table->string('address');
             $table->string('gender');

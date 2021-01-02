@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Student;
 use App\Http\Resources\StudentResource;
-use App\Http\Requests;
 
 class StudentController extends Controller
 {
@@ -16,18 +15,8 @@ class StudentController extends Controller
      */
     public function index()
     {
-        $students = Student::paginate(15);
+        $students = Student::with(['courses'])->paginate(15);
         return (StudentResource::collection($students))->response()->setStatusCode(206);
-    }
-
-    /**
-     * Show the form for creating a new student.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
     }
 
     /**
@@ -51,22 +40,11 @@ class StudentController extends Controller
      */
     public function show($id)
     {
-        $student = Student::findOrFail($id);
+        $student = Student::with(['courses'])->findOrFail($id);
         if($student){
             return (new StudentResource($student))->response()->setStatusCode(200);
         }
-        return (StudentResource::collection(Student::all()))->response()->setStatusCode(404);
-    }
-
-    /**
-     * Show the form for editing the specified student.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
+        return (StudentResource::collection(Student::with(['courses'])->all()))->response()->setStatusCode(404);
     }
 
     /**
@@ -78,7 +56,7 @@ class StudentController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $student = Student::findOrFail($id);
+        $student = Student::with(['courses'])->findOrFail($id);
         $student->update($request->all());
 
         return (new StudentResource($student))->response()->setStatusCode(202);
@@ -93,8 +71,8 @@ class StudentController extends Controller
      */
     public function destroy($id)
     {
-        $student = Student::findOrFail($id);
-        $students = Student::all();
+        $student = Student::with(['courses'])->findOrFail($id);
+        $students = Student::with(['courses'])->all();
 
         if($student->delete()){
             return (StudentResource::collection($students))->response()->setStatusCode(200);

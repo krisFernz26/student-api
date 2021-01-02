@@ -22,4 +22,8 @@ class Student extends Model
         'religion', 
         'nationality', 
         'place_of_birth' ];
+
+        public function courses(){
+            return $this->belongsToMany(Course::class);
+        }
 }
